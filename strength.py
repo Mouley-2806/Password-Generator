@@ -1,8 +1,13 @@
 import hashlib
 import requests
-from .constant import(
-    COMMON_WEAK_PASSWORDS, HIBP_API_URL, HIBP_USER_AGENT, get_local_weak_hashes, add_to_local_weak_hashes, initialize_local_storage
-) 
+from .constant import (
+    COMMON_WEAK_PASSWORDS,
+    HIBP_API_URL,
+    HIBP_USER_AGENT,
+    get_local_weak_hashes,
+    add_to_local_weak_hashes,
+    initialize_local_storage
+)
 def calculate_entropy(password:str)-> tuple:
     if not password:
         return 0.0
@@ -96,6 +101,30 @@ def assess_strength(password:str, enable_learning:bool=True):
         feedback="Very Weak Password"
     if breach_info:
         feedback=breach_info+"\n"+feedback
+    if enable_learning and level in ["Weak","Very Weak"] and not breach_info:
+        try:
+            choice=input(f"Save it to Local weak list for future checks?(y/n):").strip().lower()
+            if choice=='y':
+                pwd_hash=hashlib.sha256(password.encode('utf-8')).hexadigit()
+                add_to_local_weak_hashes(pwd_hash)
+                print("Saved to Weak Password List")
+        except:
+            pass
+    return level,feedback,entropy
+
+def print_password_count(password:str):
+    level, feedback, entropy=assess_strength(password)
+    print("\n"+"="*72)
+    print(f"Password: {password}")
+    print(f"length: {len(password)} characters")
+    print(f"entropy: {entropy:.1f} bits")
+    print(f"Strength: {level}")
+    print(f"Feedback: {feedback}")
+    print(f"="*72)
+    
+    
+    
+
 
 
 
