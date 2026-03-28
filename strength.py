@@ -1,7 +1,7 @@
 import hashlib
 import requests
-from .constants import(
-    COMON_WEAK_PASWORDS, HIBP_API_URL, HIBP_USER_AGENT, get_local_weak_hashes, add_to_local_weak_hashes, initialize_local_storage
+from .constant import(
+    COMMON_WEAK_PASSWORDS, HIBP_API_URL, HIBP_USER_AGENT, get_local_weak_hashes, add_to_local_weak_hashes, initialize_local_storage
 ) 
 def calculate_entropy(password:str)-> tuple:
     if not password:
@@ -41,4 +41,63 @@ def is_pwned_hibp(password:str)->tuple:
         return False,0
     except Exception:
         return False,0
+
+def assess_strength(password:str, enable_learning:bool=True):
+    if not password:
+        return "Very Weak", "Password is empty", 0.0
+    
+    entropy=calculate_entropy(password)
+    length=len(password)
+    score=0
+    breach_info=" "
+
+    if password.lower() in COMMON_WEAK_PASSWORDS:
+        score=0
+        breach_info="This is one of the most commonly used passwords in the world"
+    else:
+        local_hashes=get_local_weak_hashes()
+        password_hash=hashlib.sha256(password.encode('utf-8')).hexdigest()
+        if password_hash in local_hashes:
+            score=0
+            breach_info="This password was previously marked as weak by you"
+    if not breach_info:
+        is_pwned, count= is_pwned_hibp(password)
+        if is_pwned:
+            score=0
+            breach_info=f"This password has been breached{count:,} times in real data leaks"
+    if length>=18:
+        score+=5
+    elif length>=14:
+        score+=4
+    elif length>=12:
+        score+=3
+    elif length>=8:
+        score+=2
+    if any(c.islower() for c in password): score+=1
+    if any(c.isupper()for c in password): score+=1
+    if any(c.isdigits() for c in password): score+=1
+    if any(not c.isalnum() for c in password): score+=1
+
+    if entropy >=80: score+=3
+    elif entropy>=60: score+=3
+    elif entropy>=40: score+=2
+
+    if score>=12:
+        level="Very Strong"
+        feedback="Excellent extremely hard to guess!"
+    elif score>=9:
+        level="Strong"
+        feedback="Great Password. Highly recommended"
+    elif score>=6:
+        level="Medium"
+        feedback="Decent, but can be improved"
+    elif score>=3:
+        level="Weak"
+        feedback="Very Weak Password"
+    if breach_info:
+        feedback=breach_info+"\n"+feedback
+
+
+
+
 
