@@ -39,20 +39,20 @@ def interactive_mode():
                 print("\nAnalyzing password strength...")
                 level, feedback, entropy = assess_strength(pwd)
                 print("\n" + "=" * 72)
-                print(f"🔑 Password     :  {pwd}")
-                print(f"📏 Length       :  {len(pwd)} characters")
-                print(f"🔢 Entropy      :  {entropy:.1f} bits")
-                print(f"💪 Strength     :  {level}")
-                print(f"📝 Feedback     :  {feedback}")
+                print(f" Password     :  {pwd}")
+                print(f" Length       :  {len(pwd)} characters")
+                print(f" Entropy      :  {entropy:.1f} bits")
+                print(f" Strength     :  {level}")
+                print(f" Feedback     :  {feedback}")
                 print("=" * 72)
 
         elif choice == "3":
-            print("\n👋 Thank you for using the Advanced Password Generator!")
-            print("   Stay secure! 🔐")
+            print("\n Thank you for using the Advanced Password Generator!")
+            print("   Stay secure! ")
             break
 
         else:
-            print("❌ Invalid choice! Please enter 1, 2, or 3.")
+            print(" Invalid choice! Please enter 1, 2, or 3.")
 
     
                     
